@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# S DIVA Premium Salon & Spa — Cinematic Redesign
 
-## Getting Started
+Production Next.js website for **S DIVA Premium Salon & Spa**, Chandrasekharpur, Bhubaneswar.
 
-First, run the development server:
+## What's inside
+
+- Mobile-first cinematic hero and editorial storytelling sections.
+- Responsive navigation, native-scroll reveals and light parallax.
+- A **dependency-free, optional WebGL gold sculpture**, only initialized when close to the viewport. It pauses when off-screen or the tab is hidden, respects reduced motion and data saver preferences, and gracefully falls back when WebGL is unavailable.
+- Searchable, filtered **accordion treatment menu**, retaining the original `src/lib/menu.ts` data and `/public/menu/sdiva-services-menu.pdf` brochure.
+- Tap-to-call booking actions, location details and mobile booking bar.
+- SEO metadata for `https://sdivasalon.com/`, JSON-LD structured business data, `public/robots.txt`, and `public/sitemap.xml`.
+
+No third-party animations or 3D libraries were introduced: the experience uses CSS, IntersectionObserver, requestAnimationFrame and the browser's WebGL API so that mobile visitors don't need to download another rendering engine. The original Next.js dependency versions remain unchanged.
+
+## Local setup
+
+Use Node.js 20.9+ and an internet connection for the initial dependency installation.
 
 ```bash
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open <http://localhost:3000>.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+To verify production readiness:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run lint
+npx tsc --noEmit
+npm run build
+```
 
-## Learn More
+## Deployment safety
 
-To learn more about Next.js, take a look at the following resources:
+This is a redesign archive, **not a deployed update**. Develop on a separate branch, run the checks above, verify the layout on physical mobile devices and in a Vercel preview, then merge and deploy only when approved. The original domain records and DNS settings do not need to change.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Content and prices
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+`src/lib/menu.ts` preserves the supplied menu transcription. Prices may change, so booking and menu copy directs visitors to confirm current details. Images are reused from the supplied project. Replace them with permissioned, authentic high-quality images when available; image quality has a significant effect on the final result.
 
-## Deploy on Vercel
+## File map
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `src/app/page.tsx` — semantic homepage sections and business schema
+- `src/app/globals.css` — design system, animation and responsive styling
+- `src/app/components/SiteHeader.tsx` — navigation and mobile menu
+- `src/app/components/ScrollExperience.tsx` — passive scroll animation orchestration
+- `src/app/components/GoldSculpture.tsx` — small WebGL visual scene
+- `src/app/components/ServiceMenu.tsx` — treatment filters, search and accordion
+- `src/lib/menu.ts` — original menu data
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Accessibility and performance
+
+- Respects `prefers-reduced-motion` and keeps native browser scrolling.
+- Accessible headings, semantic landmarks, descriptive image text and touch-sized controls.
+- Pauses the WebGL scene offscreen and when tab is hidden; caps render size/pixel density.
+- Hero image receives load priority; secondary images are lazy loaded by Next.js.
+
+Real-world LCP, CLS, INP and frame rates must be verified using a production build on representative devices. **No performance score is claimed without testing.**
