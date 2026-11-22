@@ -1,32 +1,20 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-
 export const metadata: Metadata = {
-  title: "S DIVA Premium Salon & Spa | Bhubaneswar",
-  description:
-    "Discover salon, hair, beauty and spa services at S DIVA Premium Salon & Spa in Chandrasekharpur, Bhubaneswar.",
+  metadataBase: new URL("https://s-diva-website.vercel.app"),
+  title: "S DIVA Premium Salon & Spa | Chandrasekharpur, Bhubaneswar",
+  description: "Discover S DIVA Premium Salon & Spa in Chandrasekharpur, Bhubaneswar. Explore hair artistry, facials, massage, grooming, service prices and signature experiences. Call to book.",
+  keywords: ["S DIVA", "S DIVA salon", "salon Bhubaneswar", "spa Chandrasekharpur", "salon near Embassy Club", "hair spa Bhubaneswar"],
+  openGraph: {
+    title: "S DIVA Premium Salon & Spa | The Art of the Reset",
+    description: "Explore our services, prices and signature experiences. Find your moment at S DIVA in Bhubaneswar.",
+    type: "website",
+    locale: "en_IN",
+    images: [{ url: "/images/spa-hero.webp", width: 1800, height: 1200, alt: "S DIVA Premium Salon & Spa" }],
+  },
 };
 
-
-export default function RootLayout({ children }: LayoutProps<"/">) {
-  return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
-    </html>
-  );
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  return <html lang="en"><body>{children}</body></html>;
 }

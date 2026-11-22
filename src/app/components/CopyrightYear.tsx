@@ -1,13 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 
 export default function CopyrightYear() {
-  const [year, setYear] = useState(2026);
-
+  const yearRef = useRef<HTMLSpanElement>(null);
   useEffect(() => {
-    setYear(new Date().getFullYear());
+    if (yearRef.current) yearRef.current.textContent = String(new Date().getFullYear());
   }, []);
-
-  return <span>{year}</span>;
+  return <span ref={yearRef}>2026</span>;
 }
