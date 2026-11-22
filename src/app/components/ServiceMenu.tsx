@@ -1,11 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import type { ChangeEvent } from "react";
 import { menu } from "@/lib/menu";
 
 type Group = "all" | "hair" | "beauty" | "body" | "packages";
 const filters: { id: Group; label: string }[] = [
-  { id: "all", label: "All treatments" },
+  { id: "all", label: "All" },
   { id: "hair", label: "Hair & grooming" },
   { id: "beauty", label: "Beauty & skin" },
   { id: "body", label: "Body massage" },
@@ -15,6 +16,7 @@ const filters: { id: Group; label: string }[] = [
 export default function ServiceMenu() {
   const [active, setActive] = useState<Group>("all");
   const [search, setSearch] = useState("");
+  const [expanded, setExpanded] = useState<string[]>(["women-hair"]);
 
   const visible = useMemo(() => {
     const term = search.trim().toLocaleLowerCase();
@@ -22,70 +24,42 @@ export default function ServiceMenu() {
       .filter((category) => active === "all" || category.group === active)
       .map((category) => ({
         ...category,
-        items: term
-          ? category.items.filter((item) => `${item.name} ${item.detail ?? ""} ${category.title}`.toLocaleLowerCase().includes(term))
-          : category.items,
+        items: term ? category.items.filter((item) => `${item.name} ${item.detail ?? ""} ${category.title}`.toLocaleLowerCase().includes(term)) : category.items,
       }))
       .filter((category) => category.items.length > 0);
   }, [active, search]);
 
   return (
-    <div>
+    <div className="service-directory">
       <div className="menu-controls">
-        <div className="menu-filters" role="group" aria-label="Filter treatments by category">
-          {filters.map((filter) => (
-            <button
-              key={filter.id}
-              type="button"
-              aria-pressed={active === filter.id}
-              className={`filter-pill ${active === filter.id ? "filter-pill-active" : ""}`}
-              onClick={() => setActive(filter.id)}
-            >
-              {filter.label}
-            </button>
-          ))}
+        <div className="menu-filters" aria-label="Filter treatments by type">
+          {filters.map((filter) => <button key={filter.id} type="button" aria-pressed={active === filter.id} className={active === filter.id ? "filter-pill is-active" : "filter-pill"} onClick={() => { setActive(filter.id); setExpanded([]); }}>{filter.label}</button>)}
         </div>
-        <label className="menu-search">
-          <span className="sr-only">Search treatments</span>
-          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg>
-          <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Find a treatment..." type="search" />
-        </label>
+        <label className="menu-search"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.6"/><path d="m16 16 5 5"/></svg><span className="sr-only">Search treatments</span><input type="search" placeholder="Find a treatment..." value={search} onChange={(event: ChangeEvent<HTMLInputElement>) => setSearch(event.target.value)} /></label>
       </div>
-
-      <div className="menu-grid" aria-live="polite">
-        {visible.length === 0 ? (
-          <div className="menu-empty">No treatments match your search. Try another name or category.</div>
-        ) : visible.map((category) => (
-          <section key={category.id} className="menu-card" aria-labelledby={`${category.id}-title`}>
-            <div className="menu-card-header">
-              <p className="eyebrow menu-card-label">{category.eyebrow}</p>
-              <h3 id={`${category.id}-title`} className="menu-card-title">{category.title}</h3>
-              {category.description && <p className="menu-card-description">{category.description}</p>}
+      <p className="menu-count" aria-live="polite">EXPLORE {visible.length} SERVICE {visible.length === 1 ? "CATEGORY" : "CATEGORIES"}</p>
+      <div className="menu-accordions">
+        {visible.length === 0 ? <div className="menu-empty">We couldn&apos;t find that treatment. Try another search or category.</div> : visible.map((category) => {
+          const open = search.trim() !== "" || expanded.includes(category.id);
+          const regionId = `menu-panel-${category.id}`;
+          return <section className={`menu-accordion ${open ? "is-expanded" : ""}`} key={category.id}>
+            <h3 className="menu-heading"><button type="button" aria-expanded={open} aria-controls={regionId} onClick={() => setExpanded((current) => current.includes(category.id) ? current.filter((id) => id !== category.id) : [...current, category.id])}>
+              <span className="menu-no">{String(menu.findIndex((cat) => cat.id === category.id) + 1).padStart(2, "0")}</span>
+              <span className="menu-name">{category.title}<small>{category.eyebrow.split("/")[1]?.trim()} · {category.items.length} services</small></span>
+              <span className="menu-plus" aria-hidden="true"><i /><i /></span>
+            </button></h3>
+            <div id={regionId} className="menu-accordion-content" hidden={!open}>
+              {category.description && <p className="menu-intro">{category.description}</p>}
+              <div className="menu-items">{category.items.map((item) => <div className="menu-item" key={`${category.id}-${item.name}`}><div><span className="menu-item-name">{item.name}</span>{item.detail && <small>{item.detail}</small>}</div><span className="menu-item-price">{item.price}</span></div>)}</div>
             </div>
-            <div className="menu-items">
-              {category.items.map((item) => (
-                <div key={`${category.id}-${item.name}`} className="menu-item">
-                  <div className="min-w-0">
-                    <p className="menu-item-name">{item.name}</p>
-                    {item.detail && <p className="menu-item-detail">{item.detail}</p>}
-                  </div>
-                  <span className="menu-item-price">{item.price}</span>
-                </div>
-              ))}
-            </div>
-          </section>
-        ))}
+          </section>;
+        })}
       </div>
-
-      <div className="menu-booking-panel">
-        <div>
-          <p className="eyebrow text-[#c7a777]">FOUND YOUR RITUAL?</p>
-          <h3 className="font-display text-[clamp(2rem,4vw,3.25rem)] leading-tight text-white">Your next moment of calm awaits.</h3>
-          <p className="mt-3 max-w-lg text-[#d5cec1]">Browse the menu, then call our reception directly. Our team will help you arrange an appointment.</p>
-        </div>
-        <a className="button-gold shrink-0" href="tel:+918249000620">Call to book <span aria-hidden="true">↗</span></a>
+      <div className="menu-after">
+        <div><span className="overline">FOUND YOUR RITUAL?</span><h3>Let&apos;s make a<br /><em>moment of it.</em></h3><p>Our reception team will help you arrange your appointment.</p></div>
+        <a href="tel:+918249000620" className="button-primary"><span>Call to book</span><span className="button-arrow" aria-hidden="true">↗</span></a>
       </div>
-      <p className="menu-disclaimer">Prices are from S DIVA’s supplied menu and may change. “From” prices depend on the service. Contact the salon to confirm the final price, inclusions and availability.</p>
+      <p className="menu-disclaimer">Prices are from S DIVA&apos;s supplied menu and may change. “From” prices depend on the treatment. Please confirm current pricing, inclusions and availability with the salon.</p>
     </div>
   );
 }
